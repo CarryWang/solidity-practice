@@ -1,7 +1,39 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract BaseERC20 {
+interface IERC20 {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+
+    function balanceOf(address _owner) external view returns (uint256 balance);
+
+    function transfer(
+        address _to,
+        uint256 _value
+    ) external returns (bool success);
+
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    ) external returns (bool success);
+
+    function approve(
+        address _spender,
+        uint256 _value
+    ) external returns (bool success);
+
+    function allowance(
+        address _owner,
+        address _spender
+    ) external view returns (uint256 remaining);
+}
+
+contract BaseERC20 is IERC20 {
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -10,13 +42,6 @@ contract BaseERC20 {
     mapping(address => uint256) balances;
 
     mapping(address => mapping(address => uint256)) allowances;
-
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
 
     constructor() {
         // write your code here
