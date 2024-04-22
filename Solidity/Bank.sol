@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Back {
+contract Bank {
     mapping(address => uint) balances;
     address public admin;
     address[3] public top3;
