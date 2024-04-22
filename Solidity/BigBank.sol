@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Back {
+interface IBank {
+    function admin() external view returns (address);
+
+    function withdraw(uint256 amount) external;
+}
+
+contract Bank is IBank {
     mapping(address => uint256) balances;
     address public admin;
     address[3] public top3;
@@ -20,7 +26,7 @@ contract Back {
         _;
     }
 
-    function withdraw(uint256 amount) public payable virtual onlyAdmin {
+    function withdraw(uint256 amount) public onlyAdmin {
         require(amount <= address(this).balance, "Insufficient balance");
         payable(admin).transfer(amount);
     }
@@ -54,7 +60,7 @@ contract Ownable {
 
     function transferOwnership(address _bankAddress) public onlyOwner {
         require(_bankAddress != address(0), "Invalid address");
-        owner = IBank(_bankAddress).getAdmin();
+        owner = IBank(_bankAddress).admin();
         bankAddress = _bankAddress;
     }
 
@@ -63,23 +69,15 @@ contract Ownable {
             bankAddress != address(0),
             "Please call transferOwnership first"
         );
-        IBank(bankAddress).withdraw(amount);
+        BigBank(bankAddress).withdraw(amount);
     }
+
+    receive() external payable {}
 }
 
-interface IBank {
-    function getAdmin() external view returns (address);
-
-    function withdraw(uint256 amount) external payable;
-}
-
-contract BigBank is Back, IBank {
+contract BigBank is Bank {
     function transferAdmin(address newAdmin) public onlyAdmin {
         admin = newAdmin;
-    }
-
-    function getAdmin() public view returns (address) {
-        return admin;
     }
 
     modifier checkMinDeposit() {
@@ -92,9 +90,5 @@ contract BigBank is Back, IBank {
 
     function deposit() public payable override checkMinDeposit {
         super.deposit();
-    }
-
-    function withdraw(uint256 amount) public payable override(Back, IBank) {
-        super.withdraw(amount);
     }
 }
