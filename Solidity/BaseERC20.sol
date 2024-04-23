@@ -49,7 +49,7 @@ contract BaseERC20 is IERC20 {
         name = "BaseERC20";
         symbol = "BERC20";
         decimals = 18;
-        totalSupply = 100000000 * 10 ** 18;
+        totalSupply = 100000000 * 10 ** decimals;
         balances[msg.sender] = totalSupply;
     }
 
@@ -85,7 +85,7 @@ contract BaseERC20 is IERC20 {
             "ERC20: transfer amount exceeds balance"
         );
         require(
-            allowances[_from][msg.sender] >= _value,
+            allowance(_from, msg.sender) >= _value,
             "ERC20: transfer amount exceeds allowance"
         );
 
