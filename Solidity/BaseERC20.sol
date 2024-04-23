@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./TokenBank.sol";
+
 interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(
@@ -70,17 +72,18 @@ contract BaseERC20 is IERC20 {
 
         _transfer(msg.sender, _to, _value);
 
-        // Add a callback
+        return true;
+    }
+
+    function transferWithCallback(
+        address _to,
+        uint256 _value
+    ) public returns (bool success) {
+        _transfer(msg.sender, _to, _value);
+
         // Check if recipient is a contract
         if (isContract(_to)) {
-            // Call tokensReceived on recipient if it's a contract
-            (bool res, ) = _to.call(
-                abi.encodeWithSignature(
-                    "tokensReceived(address, uint256)",
-                    msg.sender,
-                    _value
-                )
-            );
+            bool res = IBank(_to).tokensReceived(msg.sender, _value);
             require(res, "Transfer failed: tokensReceived not implemented");
         }
 

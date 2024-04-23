@@ -3,6 +3,13 @@ pragma solidity ^0.8.0;
 
 import "./BaseERC20.sol";
 
+interface IBank {
+    function tokensReceived(
+        address userAddress,
+        uint256 _value
+    ) external returns (bool);
+}
+
 contract TokenBank {
     mapping(address => uint256) public bankBalances;
 
@@ -26,6 +33,14 @@ contract TokenBank {
 
         bankBalances[msg.sender] -= _value;
 
+        return true;
+    }
+
+    function tokensReceived(
+        address userAddress,
+        uint256 _value
+    ) public returns (bool) {
+        bankBalances[userAddress] += _value;
         return true;
     }
 }
