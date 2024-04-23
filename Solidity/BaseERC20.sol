@@ -67,10 +67,23 @@ contract BaseERC20 is IERC20 {
             _value <= balances[msg.sender],
             "ERC20: transfer amount exceeds balance"
         );
-        balances[msg.sender] -= _value;
-        balances[_to] += _value;
 
-        emit Transfer(msg.sender, _to, _value);
+        _transfer(msg.sender, _to, _value);
+
+        // Add a callback
+        // Check if recipient is a contract
+        if (isContract(_to)) {
+            // Call tokensReceived on recipient if it's a contract
+            (bool res, ) = _to.call(
+                abi.encodeWithSignature(
+                    "tokensReceived(address, uint256)",
+                    msg.sender,
+                    _value
+                )
+            );
+            require(res, "Transfer failed: tokensReceived not implemented");
+        }
+
         return true;
     }
 
@@ -89,11 +102,10 @@ contract BaseERC20 is IERC20 {
             "ERC20: transfer amount exceeds allowance"
         );
 
-        balances[_from] -= _value;
-        balances[_to] += _value;
-
         allowances[_from][msg.sender] -= _value;
-        emit Transfer(_from, _to, _value);
+
+        _transfer(_from, _to, _value);
+
         return true;
     }
 
@@ -113,5 +125,19 @@ contract BaseERC20 is IERC20 {
     ) public view returns (uint256 remaining) {
         // write your code here
         return allowances[_owner][_spender];
+    }
+
+    function _transfer(address from, address to, uint256 amount) private {
+        balances[from] -= amount;
+        balances[to] += amount;
+        emit Transfer(from, to, amount);
+    }
+
+    function isContract(address addr) internal view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(addr)
+        }
+        return size > 0;
     }
 }
