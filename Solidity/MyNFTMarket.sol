@@ -22,19 +22,23 @@ contract NFTMarket is IERC721Receiver {
         uint256 tokenId,
         bytes calldata data
     ) external override returns (bytes4) {
+        tokenIdPrice[tokenId] = abi.decode(data, (uint));
+        tokenSeller[tokenId] = msg.sender;
+
         return this.onERC721Received.selector;
     }
 
     // approve(address to, uint256 tokenId) first
     function list(uint tokenID, uint amount) public {
+        bytes memory data = abi.encode(amount);
         IERC721(nftToken).safeTransferFrom(
             msg.sender,
             address(this),
             tokenID,
-            ""
+            data
         );
-        tokenIdPrice[tokenID] = amount;
-        tokenSeller[tokenID] = msg.sender;
+        // tokenIdPrice[tokenID] = amount;
+        // tokenSeller[tokenID] = msg.sender;
     }
 
     function buy(uint tokenId, uint amount) external {
