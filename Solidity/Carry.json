@@ -1,0 +1,10 @@
+{
+  "title": "My First NFT #1",
+  "description": "This is my first NFT ever!",
+  "image": "ipfs://QmbSFBLLiPVMgeb6t3uUd1GDvm2d4wobG3mWPeacNBhS8D",
+  "attributes": [
+    { "trait_type": "Author", "value": "CarryWang" },
+    { "trait_type": "Edition", "value": "First" },
+    { "trait_type": "Awesomeness", "value": "100%" }
+  ]
+}

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./BaseERC20.sol";
+import "./MyERC20.sol";
 
 interface IBank {
     function tokensReceived(
