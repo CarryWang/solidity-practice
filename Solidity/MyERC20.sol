@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "./TokenBank.sol";
+import "./MyNFTMarket.sol";
 
 interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -86,6 +87,20 @@ contract BaseERC20 is IERC20 {
         if (isContract(_to)) {
             bool res = IBank(_to).tokensReceived(msg.sender, _value);
             require(res, "Transfer failed: tokensReceived not implemented");
+        }
+
+        return true;
+    }
+
+    function transferWithNFTCallback(address _to, uint nftId, uint256 amount) {
+        _transfer(msg.sender, _to, amount);
+        if (isContract(_to)) {
+            bool success = IMarket(_to).tokenReceived(
+                msg.sender,
+                nftId,
+                amount
+            );
+            require(success, "No tokens received");
         }
 
         return true;

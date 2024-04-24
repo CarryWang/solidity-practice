@@ -10,7 +10,7 @@ interface IBank {
     ) external returns (bool);
 }
 
-contract TokenBank {
+contract TokenBank is IBank {
     mapping(address => uint256) public bankBalances;
 
     function deposit(

@@ -5,7 +5,15 @@ import "./MyERC20.sol";
 import "./MyERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract NFTMarket is IERC721Receiver {
+interface IMarket {
+    function tokenReceived(
+        address sender,
+        uint nftId,
+        uint amount
+    ) external returns (bool);
+}
+
+contract NFTMarket is IERC721Receiver, IMarket {
     mapping(uint => uint) public tokenIdPrice;
     mapping(uint => address) public tokenSeller;
     address public immutable token;
@@ -55,5 +63,22 @@ contract NFTMarket is IERC721Receiver {
             tokenIdPrice[tokenId]
         );
         IERC721(nftToken).transferFrom(address(this), msg.sender, tokenId);
+    }
+
+    function tokenReceived(
+        address sender,
+        uint nftId,
+        uint amount
+    ) external returns (bool) {
+        require(sender == token, "invalid caller");
+
+        require(
+            tokenIdPrice[nftId] <= amount,
+            "payment value is less than list price"
+        );
+
+        IERC20(token).transfer(tokenSeller[nftId], tokenIdPrice[nftId]);
+        IERC721(nftToken).safeTransferFrom(address(this), sender, nftId);
+        return true;
     }
 }
