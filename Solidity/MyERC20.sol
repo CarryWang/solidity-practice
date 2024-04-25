@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./TokenBank.sol";
-import "./MyNFTMarket.sol";
+import {IReceiver} from "./IReceiver.sol";
 
 interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -79,28 +78,15 @@ contract BaseERC20 is IERC20 {
 
     function transferWithCallback(
         address _to,
-        uint256 _value
+        uint256 _value,
+        bytes calldata data
     ) public returns (bool success) {
         _transfer(msg.sender, _to, _value);
 
         // Check if recipient is a contract
-        if (isContract(_to)) {
-            bool res = IBank(_to).tokensReceived(msg.sender, _value);
+        if (_to.code.length > 0) {
+            bool res = IReceiver(_to).tokensReceived(msg.sender, _value, data);
             require(res, "Transfer failed: tokensReceived not implemented");
-        }
-
-        return true;
-    }
-
-    function transferWithNFTCallback(address _to, uint nftId, uint256 amount) {
-        _transfer(msg.sender, _to, amount);
-        if (isContract(_to)) {
-            bool success = IMarket(_to).tokenReceived(
-                msg.sender,
-                nftId,
-                amount
-            );
-            require(success, "No tokens received");
         }
 
         return true;

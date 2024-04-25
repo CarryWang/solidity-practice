@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -14,11 +14,11 @@ contract MyERC721 is ERC721URIStorage {
 
     // ipfs://QmXWpQHdnxsu5PzAC7ghgUnFS6YF4PxkJc4JKDTa8rVLJx
     function mint(
-        address student,
+        address user,
         string memory tokenURI
     ) public returns (uint256) {
         uint256 newItemId = _tokenIds.current();
-        _mint(student, newItemId);
+        _mint(user, newItemId);
         _setTokenURI(newItemId, tokenURI);
 
         _tokenIds.increment();

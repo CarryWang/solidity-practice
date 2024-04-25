@@ -1,35 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./MyERC20.sol";
+import {IERC20} from "./MyERC20.sol";
+import {IReceiver} from "./IReceiver.sol";
 
-interface IBank {
-    function tokensReceived(
-        address userAddress,
-        uint256 _value
-    ) external returns (bool);
-}
-
-contract TokenBank is IBank {
+contract TokenBank is IReceiver {
     mapping(address => uint256) public bankBalances;
+    address public immutable token;
 
-    function deposit(
-        address tokenAddress,
-        uint256 _value
-    ) public returns (bool) {
-        IERC20(tokenAddress).transferFrom(msg.sender, address(this), _value);
+    constructor(address _token) {
+        token = _token;
+    }
+
+    function deposit(uint256 _value) public returns (bool) {
+        IERC20(token).transferFrom(msg.sender, address(this), _value);
 
         bankBalances[msg.sender] += _value;
 
         return true;
     }
 
-    function withdraw(
-        address tokenAddress,
-        uint256 _value
-    ) public returns (bool) {
+    function withdraw(uint256 _value) public returns (bool) {
         require(bankBalances[msg.sender] >= _value, "Insufficient balance");
-        IERC20(tokenAddress).transfer(msg.sender, _value);
+        IERC20(token).transfer(msg.sender, _value);
 
         bankBalances[msg.sender] -= _value;
 
@@ -37,10 +30,11 @@ contract TokenBank is IBank {
     }
 
     function tokensReceived(
-        address userAddress,
-        uint256 _value
+        address _from,
+        uint256 _value,
+        bytes calldata data
     ) public returns (bool) {
-        bankBalances[userAddress] += _value;
+        bankBalances[_from] += _value;
         return true;
     }
 }
