@@ -32,7 +32,7 @@ contract TokenBank is IReceiver {
     function tokensReceived(
         address _from,
         uint256 _value,
-        bytes calldata data
+        bytes calldata
     ) public returns (bool) {
         bankBalances[_from] += _value;
         return true;

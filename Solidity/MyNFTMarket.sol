@@ -19,14 +19,13 @@ contract NFTMarket is IERC721Receiver, IReceiver {
     }
 
     function onERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes calldata data
-    ) external override returns (bytes4) {
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure override returns (bytes4) {
         // tokenIdPrice[tokenId] = abi.decode(data, (uint));
         // tokenSeller[tokenId] = msg.sender;
-
         return this.onERC721Received.selector;
     }
 
