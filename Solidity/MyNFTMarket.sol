@@ -51,7 +51,7 @@ contract NFTMarket is IERC721Receiver, IReceiver {
 
         require(tokenIdPrice[tokenId] <= amount, "payment value is less than list price");
 
-        IERC20(token).transfer(tokenIdSeller[tokenId], amount);
+        IERC20(token).transfer(tokenSeller[tokenId], amount);
         IERC721(nftToken).safeTransferFrom(address(this), _from, tokenId);
         return true;
     }
